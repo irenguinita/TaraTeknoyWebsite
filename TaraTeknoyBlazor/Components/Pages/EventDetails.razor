@@ -1,0 +1,128 @@
+﻿@page "/events/{EventId:int}"
+
+<div class="event-details-page">
+
+    <!-- ===================== FIXED HEADER ===================== -->
+    <header class="event-details-header">
+        <div class="event-details-header__row">
+            <img class="event-details-header__logo" src="images/logo2.png" alt="Tara Teknoy" />
+
+            <div class="event-details-header__actions">
+                <button class="icon-btn" type="button" @onclick="OnSearchClicked" aria-label="Search">
+                    <img src="images/search.png" alt="" />
+                </button>
+                <button class="icon-btn" type="button" @onclick="OnProfileClicked" aria-label="Profile">
+                    <img src="images/profile.png" alt="" />
+                </button>
+            </div>
+        </div>
+        <div class="event-details-header__rule"></div>
+    </header>
+
+    <!-- ===================== SCROLLABLE CONTENT ===================== -->
+    <main class="event-details-content">
+
+        <div class="event-details-grid">
+
+            <!-- ---------- Left column ---------- -->
+            <div class="event-details-left">
+                <div class="event-hero-image"></div>
+
+                <div class="info-row">
+                    <div class="info-row__text">
+                        <p class="info-row__primary">@Event.DateLabel</p>
+                        <p class="info-row__secondary">@Event.TimeRange</p>
+                    </div>
+                    <button class="info-row__action" type="button" @onclick="OnAddToCalendar" aria-label="Add to calendar">
+                        Add to Calendar
+                    </button>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-row__text">
+                        <p class="info-row__primary">@Event.Building</p>
+                        <p class="info-row__secondary">@Event.Room</p>
+                    </div>
+                    <button class="info-row__action" type="button" @onclick="OnGetDirections" aria-label="Get directions">
+                        Directions
+                    </button>
+                </div>
+
+                <div class="info-row info-row--last">
+                    <div class="info-row__text">
+                        <p class="info-row__primary">Attendees</p>
+                        <p class="info-row__secondary">@Event.Attendees/@Event.Capacity</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------- Right column ---------- -->
+            <div class="event-details-right">
+                <h1 class="event-title">@Event.Title</h1>
+                <p class="event-org">@Event.OrganizationName</p>
+
+                @foreach (var paragraph in Event.DescriptionParagraphs)
+                {
+                    <p class="event-description">@paragraph</p>
+                }
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ===================== FIXED FOOTER / RSVP BAR ===================== -->
+    <footer class="rsvp-bar">
+        <span class="rsvp-bar__greeting">Tara, Teknoy!</span>
+        <button class="rsvp-bar__button" type="button" @onclick="OnRsvpClicked">RSVP</button>
+    </footer>
+</div>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private EventDetailsModel Event { get; set; } = EventDetailsModel.Placeholder;
+
+    protected override void OnInitialized()
+    {
+        // TODO: load the real event using EventId from your API / service layer.
+        Event = EventDetailsModel.Placeholder;
+    }
+
+    private void OnSearchClicked() { /* TODO: open search */ }
+    private void OnProfileClicked() { /* TODO: navigate to profile */ }
+    private void OnAddToCalendar() { /* TODO: add event to calendar */ }
+    private void OnGetDirections() { /* TODO: open directions */ }
+    private void OnRsvpClicked() { /* TODO: handle RSVP */ }
+
+    public class EventDetailsModel
+    {
+        public string Title { get; set; } = "";
+        public string OrganizationName { get; set; } = "";
+        public string DateLabel { get; set; } = "";
+        public string TimeRange { get; set; } = "";
+        public string Building { get; set; } = "";
+        public string Room { get; set; } = "";
+        public int Attendees { get; set; }
+        public int Capacity { get; set; }
+        public List<string> DescriptionParagraphs { get; set; } = new();
+
+        public static EventDetailsModel Placeholder => new()
+        {
+            Title = "Event Title",
+            OrganizationName = "Organization Name",
+            DateLabel = "Saturday, Day Month Year",
+            TimeRange = "00:00 A.M. - 00:00 P.M.",
+            Building = "GLE BLDG",
+            Room = "Room 201",
+            Attendees = 45,
+            Capacity = 60,
+            DescriptionParagraphs = new List<string>
+            {
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "Etiam rhoncus sem dui, id faucibus nisl maximus porttitor. Donec varius, neque id finibus lobortis, felis ex egestas ante, id sollicitudin arcu ante id nunc. Donec tristique urna nec suscipit pellentesque.",
+                "Curabitur fringilla consectetur porttitor. Quisque vitae nunc pulvinar, sagittis felis sit amet, interdum neque. Aliquam suscipit quam luctus, condimentum diam id, euismod leo. Phasellus tincidunt, purus vel pulvinar porta, ipsum sapien cursus ligula, vitae ultricies turpis lorem efficitur felis. Proin sed justo diam. Curabitur nibh tellus, rutrum vitae dictum vel, facilisis vehicula ipsum."
+            }
+        };
+    }
+}

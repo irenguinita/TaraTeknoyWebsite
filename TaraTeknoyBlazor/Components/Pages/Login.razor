@@ -42,21 +42,10 @@
 
     private void HandleLogin()
     {
-        // Simple mock backend validation
-        if (string.IsNullOrWhiteSpace(email) || !email.EndsWith(".edu"))
-        {
-            errorMessage = "Please enter a valid university email (.edu).";
-        }
-        else if (string.IsNullOrWhiteSpace(password) || password.Length < 4)
-        {
-            errorMessage = "Password must be at least 4 characters.";
-        }
-        else
-        {
-            errorMessage = "";
-            // SUCCESS: Navigates back loosely to home page (or route mapping "/")
-            NavManager.NavigateTo("/");
-        }
+        
+            // SUCCESS: Navigates to the events page
+        NavManager.NavigateTo("/events");
+        
     }
 }
 

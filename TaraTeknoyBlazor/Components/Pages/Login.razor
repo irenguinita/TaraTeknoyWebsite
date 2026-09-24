@@ -1,40 +1,52 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
 @inject NavigationManager NavManager
 
-<div class="fixed inset-0 z-[1000] flex min-h-screen w-screen items-center justify-center overflow-y-auto bg-[#801A1A]">
-    <div class="w-full max-w-[400px] p-5 text-center text-white">
+<div class="fixed inset-0 z-[1000] flex min-h-screen w-screen items-center justify-center overflow-y-auto bg-[#801A1A] p-4">
+    <div class="w-full max-w-[380px] rounded-2xl border border-white/10 bg-[#801A1A] p-6 text-center text-white shadow-2xl">
 
-        <!-- Tara Teknoy Branding Image -->
-        <div class="mx-auto mb-6 max-w-[280px]">
-            <img src="@Assets["images/logo_tarateknoy.png"]" class="block h-auto w-full" alt="Tara Teknoy Logo" />
+        <!-- Branding Image -->
+        <div class="mx-auto mb-6 max-w-[220px] transition-transform hover:scale-105">
+            <img src="/images/logo_tarateknoy.png" class="block h-auto w-full drop-shadow-md" alt="Tara Teknoy Logo" />
         </div>
 
         <!-- Form Elements -->
-        <div class="my-6">
-            <input @bind="email" type="email" placeholder="University Email (.edu)"
-                   class="w-full rounded-lg border-none bg-white px-4 py-3 text-base text-gray-800 placeholder-gray-400" />
+        <div class="my-6 space-y-4">
+            <div>
+                <input @bind="email" type="email" placeholder="University Email (.edu)"
+                       class="w-full rounded-xl border-none bg-white px-4 py-3.5 text-sm text-gray-800 placeholder-gray-400 transition-all outline-none focus:ring-2 focus:ring-[#F4C10F]" />
+            </div>
 
-            <input @bind="password" type="password" placeholder="Password"
-                   class="mt-4 w-full rounded-lg border-none bg-white px-4 py-3 text-base text-gray-800 placeholder-gray-400" />
+            <div>
+                <input @bind="password" type="password" placeholder="Password"
+                       class="w-full rounded-xl border-none bg-white px-4 py-3.5 text-sm text-gray-800 placeholder-gray-400 transition-all outline-none focus:ring-2 focus:ring-[#F4C10F]" />
+            </div>
 
-            <button @onclick="HandleLogin"
-                    class="mt-4 w-full rounded-lg border-none bg-[#F7C631] px-4 py-3 text-lg font-bold text-[#801A1A] transition-colors hover:bg-[#e0b027]">
-                Log in
+            <button @onclick="HandleLogin" disabled="@isLoading"
+                    class="flex w-full items-center justify-center rounded-xl border-none bg-[#F4C10F] px-4 py-3.5 text-base font-bold text-[#801A1A] shadow-md transition-all hover:bg-[#e0b027] active:scale-95 disabled:opacity-70">
+                @if (isLoading)
+                {
+                    <span class="animate-pulse">Logging in...</span>
+                }
+                else
+                {
+                    <span>Log in</span>
+                }
             </button>
         </div>
 
-        <!-- Optional Error Display -->
+        <!-- Error Display -->
         @if (!string.IsNullOrEmpty(errorMessage))
         {
-            <div class="mt-2 rounded bg-red-100 px-3 py-2 text-sm text-red-700">
+            <div class="mt-3 rounded-xl border border-red-500/30 bg-red-500/20 p-3 text-xs font-medium text-red-100">
                 @errorMessage
             </div>
         }
 
         <!-- Bottom Link -->
-        <div class="mt-6 text-sm text-gray-100">
+        <div class="mt-8 text-xs text-gray-200">
             Don’t have an account?
-            <a href="/signup" class="font-bold text-[#F7C631] no-underline hover:underline">Create an account</a>
+            <a href="/signup" class="ml-1 font-bold text-[#F4C10F] hover:underline">Create an account</a>
         </div>
     </div>
 </div>
@@ -43,10 +55,25 @@
     private string email = "";
     private string password = "";
     private string errorMessage = "";
+    private bool isLoading = false;
 
-    private void HandleLogin()
+    private async Task HandleLogin()
     {
-        // SUCCESS: Navigates to the events page
+        errorMessage = "";
+
+        // Hardcoded validation checks
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Please enter both your email and password.";
+            return;
+        }
+
+        if (!email.EndsWith(".edu") && !email.Contains("@"))
+        {
+            errorMessage = "Please enter a valid university email address (.edu).";
+            return;
+        }
+
         NavManager.NavigateTo("/events");
     }
 }

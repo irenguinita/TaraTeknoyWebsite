@@ -1,22 +1,24 @@
 ﻿@page "/events"
+@using Microsoft.AspNetCore.Components.Web
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 
-<div class="flex h-screen flex-col bg-white font-sans text-[#1F1F1F]">
+<div class="relative flex min-h-screen flex-col bg-white font-sans text-[#1F1F1F]">
 
     <!-- ===================== FIXED HEADER ===================== -->
     <header class="sticky top-0 z-10 flex-none bg-white px-6 pt-4">
         <div class="flex items-center justify-between">
-            <img class="block h-12 w-auto" src="images/logo2.png" alt="Tara Teknoy" />
+            <img class="block h-12 w-auto cursor-pointer object-contain transition-transform hover:scale-105"
+                 src="/images/logo2.png" alt="Tara Teknoy" @onclick='() => Nav.NavigateTo("/events")' />
 
             <div class="flex items-center gap-4">
-                <button class="inline-flex cursor-pointer items-center justify-center border-none bg-transparent p-1"
-                        type="button" @onclick="OnSearchClicked" aria-label="Search">
-                    <img class="block h-6 w-6" src="images/search-icon.png" alt="" />
+                <button class="inline-flex cursor-pointer items-center justify-center border-none bg-transparent p-1 transition-transform hover:scale-110 active:scale-95"
+                        type="button" @onclick="ToggleSearchModal" aria-label="Search">
+                    <img class="block h-6 w-6" src="/images/search-icon.png" alt="Search" />
                 </button>
-                <button class="inline-flex cursor-pointer items-center justify-center border-none bg-transparent p-1"
-                        type="button" @onclick="OnProfileClicked" aria-label="Profile">
-                    <img class="block h-6 w-6" src="images/profile-icon.png" alt="" />
+                <button class="inline-flex cursor-pointer items-center justify-center border-none bg-transparent p-1 transition-transform hover:scale-110 active:scale-95"
+                        type="button" @onclick="ToggleProfileDrawer" aria-label="Profile">
+                    <img class="block h-6 w-6" src="/images/profile-icon.png" alt="Profile" />
                 </button>
             </div>
         </div>
@@ -31,12 +33,12 @@
             <h2 class="mb-3.5 text-xl font-bold text-[#7A1E2B]">Happening Now</h2>
 
             <div class="flex gap-4 overflow-x-auto overflow-y-hidden pb-2 [-webkit-overflow-scrolling:touch] [scroll-snap-type:x_proximity]">
-                @foreach (var ev in HappeningNow)
+                @foreach (var ev in FilteredHappeningNow)
                 {
-                    <article class="flex w-[220px] flex-none cursor-pointer flex-col gap-2 rounded-[10px] border border-[#E9E9E9] p-3 [scroll-snap-align:start]"
-                             @onclick="GoToEventDetails">
+                    <article class="flex w-[220px] flex-none cursor-pointer flex-col gap-2 rounded-[10px] border border-[#E9E9E9] p-3 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md [scroll-snap-align:start]"
+                             @onclick="() => GoToEventDetails(ev.Id)">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="inline-flex items-center rounded-full py-[3px] pl-0 font-semibold whitespace-nowrap text-[11px] text-[#7A1E2B]">@ev.TimeRange</span>
+                            <span class="inline-flex items-center rounded-full py-[3px] font-semibold whitespace-nowrap text-[11px] text-[#7A1E2B]">@ev.TimeRange</span>
                             <span class="inline-flex items-center rounded-full bg-[#F4C10F] px-2.5 py-[3px] font-semibold whitespace-nowrap text-[11px] text-[#1F1F1F]">@ev.Category</span>
                         </div>
 
@@ -46,10 +48,15 @@
                             <span class="inline-block h-2 w-2 rounded-full bg-[#2F5DE0]" title="Verified organizer"></span>
                         </p>
 
-                        <div class="h-[100px] rounded-md bg-[#D9D9D9]"></div>
+                        <div class="h-[100px] overflow-hidden rounded-md bg-[#D9D9D9]">
+                            @if (!string.IsNullOrEmpty(ev.ImageUrl))
+                            {
+                                <img src="@ev.ImageUrl" class="h-full w-full object-cover" alt="@ev.Title" />
+                            }
+                        </div>
 
                         <div class="flex items-center justify-between text-xs">
-                            <span class="inline-flex items-center gap-1">
+                            <span class="inline-flex items-center gap-1 text-gray-600">
                                 <span class="inline-block h-3 w-3 bg-[#7A1E2B] [border-radius:50%_50%_50%_0]"></span>
                                 @ev.Location
                             </span>
@@ -60,13 +67,13 @@
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <span class="inline-flex items-center gap-1">
+                            <span class="inline-flex items-center gap-1 text-xs text-gray-500">
                                 <span class="inline-block h-3 w-3 rounded-sm bg-[#7A1E2B]"></span>
                                 @ev.Attendees/@ev.Capacity
                             </span>
-                            <button class="cursor-pointer rounded-md border-none bg-[#7A1E2B] px-[18px] py-1.5 font-bold text-[13px] text-white transition-colors hover:bg-[#5C1620]"
-                                    type="button" @onclick="() => OnRsvpClicked(ev)" @onclick:stopPropagation>
-                                RSVP
+                            <button class="cursor-pointer rounded-md border-none px-[18px] py-1.5 font-bold text-[13px] text-white transition-all active:scale-95 @(ev.IsRsvped ? "bg-[#2E9E4C] hover:bg-[#25823e]" : "bg-[#7A1E2B] hover:bg-[#5C1620]")"
+                                    type="button" @onclick="() => ToggleRsvp(ev)" @onclick:stopPropagation>
+                                @(ev.IsRsvped ? "Going ✓" : "RSVP")
                             </button>
                         </div>
                     </article>
@@ -81,7 +88,7 @@
             <div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
                 @foreach (var ev in Recommended)
                 {
-                    <article class="flex cursor-pointer gap-3.5 rounded-[10px] border border-[#E9E9E9] p-3" @onclick="GoToEventDetails">
+                    <article class="flex cursor-pointer gap-3.5 rounded-[10px] border border-[#E9E9E9] p-3 shadow-sm transition-all hover:shadow-md" @onclick="() => GoToEventDetails(1)">
                         <div class="w-[120px] flex-none self-stretch rounded-md bg-[#D9D9D9]"></div>
 
                         <div class="flex min-w-0 flex-col gap-1">
@@ -100,7 +107,7 @@
                                 }
                             </div>
 
-                            <span class="inline-flex items-center gap-1">
+                            <span class="inline-flex items-center gap-1 text-xs text-gray-600">
                                 <span class="inline-block h-3 w-3 bg-[#7A1E2B] [border-radius:50%_50%_50%_0]"></span>
                                 @ev.Location
                             </span>
@@ -111,106 +118,116 @@
         </section>
 
     </main>
+
+    <!-- ===================== SEARCH MODAL OVERLAY ===================== -->
+    @if (isSearchOpen)
+    {
+        <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-20 backdrop-blur-sm" @onclick="ToggleSearchModal">
+            <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl transition-all" @onclick:stopPropagation>
+                <div class="flex items-center justify-between border-b pb-3">
+                    <h3 class="text-lg font-bold text-[#7A1E2B]">Search Events</h3>
+                    <button class="text-gray-400 hover:text-gray-700" @onclick="ToggleSearchModal">✕</button>
+                </div>
+                <div class="mt-4">
+                    <input @bind="searchQuery" @bind:event="oninput" type="text" placeholder="Search by title, category, or location..."
+                           class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-[#7A1E2B] focus:ring-1 focus:ring-[#7A1E2B] focus:outline-none" />
+                </div>
+                <p class="mt-3 text-xs text-gray-500">Showing matches for: <span class="font-semibold text-gray-800">@(string.IsNullOrWhiteSpace(searchQuery) ? "All Events" : searchQuery)</span></p>
+            </div>
+        </div>
+    }
+
+    <!-- ===================== PROFILE DRAWER OVERLAY ===================== -->
+    @if (isProfileOpen)
+    {
+        <div class="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm" @onclick="ToggleProfileDrawer">
+            <div class="h-full w-80 bg-white p-6 shadow-2xl transition-all" @onclick:stopPropagation>
+                <div class="flex items-center justify-between border-b pb-4">
+                    <h3 class="text-lg font-bold text-[#7A1E2B]">Student Profile</h3>
+                    <button class="text-gray-400 hover:text-gray-700" @onclick="ToggleProfileDrawer">✕</button>
+                </div>
+                <div class="mt-6 flex flex-col items-center text-center">
+                    <div class="flex h-20 w-20 items-center justify-center rounded-full bg-[#7A1E2B] text-2xl font-bold text-[#F4C10F]">
+                        ST
+                    </div>
+                    <h4 class="mt-3 font-bold text-gray-900">Teknoy Student</h4>
+                    <p class="text-xs text-gray-500">student@cit.edu</p>
+                </div>
+                <div class="mt-8 space-y-3">
+                    <button class="w-full rounded-lg bg-gray-100 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200">My RSVPs</button>
+                    <button class="w-full rounded-lg bg-red-50 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-100" @onclick='() => Nav.NavigateTo("/")'>Log Out</button>
+                </div>
+            </div>
+        </div>
+    }
+
 </div>
 
 @code {
+    private bool isSearchOpen = false;
+    private bool isProfileOpen = false;
+    private string searchQuery = "";
+
     private List<EventCardModel> HappeningNow { get; set; } = new();
     private List<RecommendedEventModel> Recommended { get; set; } = new();
 
+    private IEnumerable<EventCardModel> FilteredHappeningNow =>
+        string.IsNullOrWhiteSpace(searchQuery)
+            ? HappeningNow
+            : HappeningNow.Where(e => e.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                     e.Category.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                     e.Location.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+
     protected override void OnInitialized()
     {
-        // TODO: replace with data loaded from your API / service layer.
         HappeningNow = new List<EventCardModel>
         {
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Starts in 2 hours", "upcoming"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
-            new("Event Title", "Organization Name", "00:00 A.M. - 00:00 A.M.", "Category",
-                "Location", 45, 60, "Live", "live"),
+            new(1, "Teknoy Tech Summit", "Computer Students' Society", "10:00 A.M. - 12:00 P.M.", "Technology", "GLE Building", 45, 60, "Live", "live", false, "/images/event1.png"),
+            new(2, "Cultural Night 2026", "Student Council", "01:00 P.M. - 05:00 P.M.", "Culture", "Main Gymnasium", 120, 200, "Starts in 2 hours", "upcoming", false, "/images/event2.png"),
+            new(3, "CodeSprint Hackathon", "Innovators Club", "08:00 A.M. - 06:00 P.M.", "Competition", "Rizal Hall", 30, 50, "Live", "live", false, ""),
         };
 
         Recommended = new List<RecommendedEventModel>
         {
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
-            new("Event Title", "Organization Name", "Month, Day, Year", "00:00 A.M. - 00:00 A.M.",
-                "Location", "X", new List<string> { "Category", "Category" }),
+            new("AI & Robotics Expo", "Robotics Club", "Sept 28, 2026", "09:00 A.M. - 03:00 P.M.", "GLE Hall", "Technology", new List<string> { "Tech", "Robotics" }),
+            new("Campus Sports Fest", "Athletic Dept", "Oct 05, 2026", "08:00 A.M. - 05:00 P.M.", "Sports Complex", "Sports", new List<string> { "Sports", "Fitness" }),
         };
     }
 
-    private void OnSearchClicked()
+    private void ToggleSearchModal() => isSearchOpen = !isSearchOpen;
+    private void ToggleProfileDrawer() => isProfileOpen = !isProfileOpen;
+
+    private void ToggleRsvp(EventCardModel ev)
     {
-        // TODO: open search
+        ev.IsRsvped = !ev.IsRsvped;
+        if (ev.IsRsvped) ev.Attendees++;
+        else ev.Attendees--;
     }
 
-    private void OnProfileClicked()
+    private void GoToEventDetails(int id) => Nav.NavigateTo($"/events/{id}");
+
+    public class EventCardModel
     {
-        // TODO: navigate to profile
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string OrganizationName { get; set; }
+        public string TimeRange { get; set; }
+        public string Category { get; set; }
+        public string Location { get; set; }
+        public int Attendees { get; set; }
+        public int Capacity { get; set; }
+        public string StatusLabel { get; set; }
+        public string StatusModifier { get; set; }
+        public bool IsRsvped { get; set; }
+        public string ImageUrl { get; set; }
+
+        public EventCardModel(int id, string title, string org, string time, string cat, string loc, int att, int cap, string status, string mod, bool rsvp, string img)
+        {
+            Id = id; Title = title; OrganizationName = org; TimeRange = time; Category = cat;
+            Location = loc; Attendees = att; Capacity = cap; StatusLabel = status; StatusModifier = mod;
+            IsRsvped = rsvp; ImageUrl = img;
+        }
     }
 
-    private void OnRsvpClicked(EventCardModel ev)
-    {
-        // TODO: handle RSVP
-    }
-
-    private void GoToEventDetails()
-    {
-        // Hardcoded for now — swap in the real event id once details are wired to data.
-        Nav.NavigateTo("/events/1");
-    }
-
-    public record EventCardModel(
-        string Title,
-        string OrganizationName,
-        string TimeRange,
-        string Category,
-        string Location,
-        int Attendees,
-        int Capacity,
-        string StatusLabel,
-        string StatusModifier);
-
-    public record RecommendedEventModel(
-        string Title,
-        string OrganizationName,
-        string Date,
-        string TimeRange,
-        string Location,
-        string InterestTag,
-        List<string> Categories);
+    public record RecommendedEventModel(string Title, string OrganizationName, string Date, string TimeRange, string Location, string InterestTag, List<string> Categories);
 }

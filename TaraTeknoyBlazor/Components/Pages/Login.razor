@@ -1,36 +1,40 @@
 ﻿@page "/"
 @inject NavigationManager NavManager
 
-<div class="login-container d-flex align-items-center justify-content-center">
-    <div class="login-card text-center text-white">
+<div class="fixed inset-0 z-[1000] flex min-h-screen w-screen items-center justify-center overflow-y-auto bg-[#801A1A]">
+    <div class="w-full max-w-[400px] p-5 text-center text-white">
 
         <!-- Tara Teknoy Branding Image -->
-        <div class="logo-container mb-4 text-center">
-            @* <img src="logo_tarateknoy.png" class="brand-logo-img" /> *@
-            <!-- In Login.razor -->
-            <img src="@Assets["images/logo_tarateknoy.png"]" class="brand-logo-img" alt="Tara Teknoy Logo" />
+        <div class="mx-auto mb-6 max-w-[280px]">
+            <img src="@Assets["images/logo_tarateknoy.png"]" class="block h-auto w-full" alt="Tara Teknoy Logo" />
         </div>
 
         <!-- Form Elements -->
-        <div class="form-group my-4">
-            <input @bind="email" type="email" placeholder="University Email (.edu)" class="form-input" />
+        <div class="my-6">
+            <input @bind="email" type="email" placeholder="University Email (.edu)"
+                   class="w-full rounded-lg border-none bg-white px-4 py-3 text-base text-gray-800 placeholder-gray-400" />
 
-            <input @bind="password" type="password" placeholder="Password" class="form-input mt-3" />
+            <input @bind="password" type="password" placeholder="Password"
+                   class="mt-4 w-full rounded-lg border-none bg-white px-4 py-3 text-base text-gray-800 placeholder-gray-400" />
 
-            <button @onclick="HandleLogin" class="btn btn-login mt-3 w-100">Log in</button>
+            <button @onclick="HandleLogin"
+                    class="mt-4 w-full rounded-lg border-none bg-[#F7C631] px-4 py-3 text-lg font-bold text-[#801A1A] transition-colors hover:bg-[#e0b027]">
+                Log in
+            </button>
         </div>
 
         <!-- Optional Error Display -->
         @if (!string.IsNullOrEmpty(errorMessage))
         {
-            <div class="alert alert-danger py-2 mt-2" style="font-size: 0.9rem;">
+            <div class="mt-2 rounded bg-red-100 px-3 py-2 text-sm text-red-700">
                 @errorMessage
             </div>
         }
 
         <!-- Bottom Link -->
-        <div class="signup-link mt-4">
-            Don’t have an account? <a href="/signup">Create an account</a>
+        <div class="mt-6 text-sm text-gray-100">
+            Don’t have an account?
+            <a href="/signup" class="font-bold text-[#F7C631] no-underline hover:underline">Create an account</a>
         </div>
     </div>
 </div>
@@ -42,94 +46,7 @@
 
     private void HandleLogin()
     {
-        
-            // SUCCESS: Navigates to the events page
+        // SUCCESS: Navigates to the events page
         NavManager.NavigateTo("/events");
-        
     }
 }
-
-<style>
-    /* Scoped Style Overrides for custom Maroon/Gold UI */
-    .login-container {
-        background-color: #801A1A; /* Maroon Base */
-        min-height: 100vh;
-        width: 100vw;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        overflow-y: auto;
-    }
-
-    .login-card {
-        max-width: 400px;
-        width: 100%;
-        padding: 20px;
-    }
-
-    .logo-container {
-        max-width: 280px; /* Adjust width to fit your layout */
-        margin: 0 auto;
-    }
-
-    .brand-logo-img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .location-pin {
-        font-size: 3rem;
-        display: block;
-        color: #F7C631; /* Gold */
-    }
-
-    .brand-subtitle {
-        font-size: 0.95rem;
-        opacity: 0.85;
-    }
-
-    .form-input {
-        background: white;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 16px;
-        width: 100%;
-        color: #333;
-        font-size: 1rem;
-    }
-
-    .form-input::placeholder {
-        color: #999;
-    }
-
-    .btn-login {
-        background-color: #F7C631; /* Gold Button */
-        color: #801A1A !important;
-        font-weight: bold;
-        border-radius: 8px;
-        padding: 12px;
-        font-size: 1.1rem;
-        border: none;
-    }
-
-    .btn-login:hover {
-        background-color: #e0b027;
-    }
-
-    .signup-link {
-        font-size: 0.85rem;
-        color: #eee;
-    }
-
-    .signup-link a {
-        color: #F7C631;
-        font-weight: bold;
-        text-decoration: none;
-    }
-
-    .signup-link a:hover {
-        text-decoration: underline;
-    }
-</style>

@@ -1,134 +1,151 @@
 ﻿@page "/events/{EventId:int}"
 @using Microsoft.AspNetCore.Components.Web
 @rendermode InteractiveServer
-@inject NavigationManager Nav
 
-<div class="relative flex min-h-screen w-full flex-col bg-white font-sans text-[#1F1F1F]">
+<div class="relative min-h-screen w-full bg-white pb-20 text-gray-900">
 
     <!-- ===================== FIXED HEADER ===================== -->
-    <header class="sticky top-0 z-20 flex-none bg-white px-4 pt-4 shadow-sm sm:px-8 sm:pt-5">
-        <div class="mx-auto flex max-w-7xl items-center justify-between">
-            <img class="block h-10 w-auto cursor-pointer object-contain transition-transform hover:scale-105 sm:h-[52px]"
-                 src="/images/logo2.png" alt="Tara Teknoy" @onclick='() => Nav.NavigateTo("/events")' />
+    <header class="fixed top-0 right-0 left-0 z-50 bg-white shadow-sm">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+            <div class="flex items-center">
+                <img class="h-10 w-auto object-contain" src="images/logo2.png" alt="Tara Teknoy" />
+            </div>
 
-            <div class="flex items-center gap-4 sm:gap-5">
-                <button class="inline-flex cursor-pointer items-center justify-center border-none bg-transparent p-1 transition-transform hover:scale-110 active:scale-95"
-                        type="button" @onclick="ToggleSearchModal" aria-label="Search">
-                    <img class="block h-6 w-6 sm:h-[26px] sm:w-[26px]" src="/images/search-icon.png" alt="Search" />
+            <div class="flex items-center gap-3">
+                <button class="rounded-full p-2 text-[#E2AC22] transition-colors hover:bg-gray-100 focus:outline-none"
+                        type="button"
+                        @onclick="OnSearchClicked"
+                        aria-label="Search">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
                 </button>
-                <button class="inline-flex cursor-pointer items-center justify-center border-none bg-transparent p-1 transition-transform hover:scale-110 active:scale-95"
-                        type="button" @onclick="ToggleProfileDrawer" aria-label="Profile">
-                    <img class="block h-6 w-6 sm:h-[26px] sm:w-[26px]" src="/images/profile-icon.png" alt="Profile" />
+
+                <button class="rounded-full p-1 text-[#E2AC22] transition-colors hover:bg-gray-100 focus:outline-none"
+                        type="button"
+                        @onclick="OnProfileClicked"
+                        aria-label="Profile">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                    </svg>
                 </button>
             </div>
         </div>
-        <div class="mt-3 h-[3px] w-full bg-[#F4C10F] sm:mt-4"></div>
+        <div class="h-[2px] w-full bg-[#8B1E22]"></div>
     </header>
 
-    <!-- ===================== MAIN CONTENT AREA ===================== -->
-    <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-28 sm:px-8 sm:py-7">
+    <!-- ===================== SCROLLABLE CONTENT ===================== -->
+    <main class="mx-auto max-w-7xl px-4 pt-24 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
 
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-12">
+            <!-- ---------- Left Column ---------- -->
+            <div class="flex flex-col gap-6 lg:col-span-5">
+                <!-- Hero Placeholder -->
+                <div class="aspect-video w-full rounded-2xl bg-gray-300 shadow-inner"></div>
 
-            <!-- ---------- Left Column (Meta & Actions) ---------- -->
-            <div class="min-w-0 md:col-span-5 lg:col-span-4">
-                <!-- Image Placeholder -->
-                <div class="mb-5 aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#B3B3B3] shadow-inner">
-                    @if (!string.IsNullOrEmpty(Event.ImageUrl))
-                    {
-                        <img src="@Event.ImageUrl" class="h-full w-full object-cover" alt="@Event.Title" />
-                    }
-                </div>
+                <!-- Info Card Container -->
+                <div class="divide-y divide-gray-200 rounded-2xl border border-gray-100 bg-gray-50 p-4 shadow-sm">
 
-                <!-- Info List -->
-                <div class="divide-y divide-[#E9E9E9]">
-                    <!-- Date & Time -->
-                    <div class="flex items-center gap-3.5 py-3">
-                        <span class="h-[26px] w-[26px] flex-none text-[#7A1E2B]">
-                            <svg class="h-full w-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                                <rect x="3" y="5" width="18" height="16" rx="2" />
-                                <line x1="3" y1="10" x2="21" y2="10" />
-                                <line x1="8" y1="3" x2="8" y2="7" />
-                                <line x1="16" y1="3" x2="16" y2="7" />
-                            </svg>
-                        </span>
-                        <div class="min-w-0 flex-1">
-                            <p class="m-0 truncate text-base font-bold">@Event.DateLabel</p>
-                            <p class="m-0 mt-0.5 truncate text-sm text-[#4A4A4A]">@Event.TimeRange</p>
+                    <!-- Date & Time Row -->
+                    <div class="flex items-center justify-between py-3">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center text-[#8B1E22]">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    <line x1="7" y1="14" x2="9" y2="14"></line>
+                                    <line x1="11" y1="14" x2="13" y2="14"></line>
+                                    <line x1="15" y1="14" x2="17" y2="14"></line>
+                                </svg>
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">@Event.DateLabel</p>
+                                <p class="text-xs text-gray-500">@Event.TimeRange</p>
+                            </div>
                         </div>
-                        <button class="h-6 w-6 flex-none cursor-pointer border-none bg-transparent p-0 text-[#1F1F1F] transition-transform hover:scale-110 active:scale-90"
-                                type="button" @onclick="OnAddToCalendar" aria-label="Add to calendar" title="Add to Calendar">
-                            <svg class="h-full w-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                                <rect x="3" y="5" width="18" height="16" rx="2" />
-                                <line x1="3" y1="10" x2="21" y2="10" />
-                                <line x1="12" y1="13" x2="12" y2="18" />
-                                <line x1="9.5" y1="15.5" x2="14.5" y2="15.5" />
+                        <button class="rounded-lg p-2 text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none"
+                                type="button"
+                                @onclick="OnAddToCalendar"
+                                aria-label="Add to calendar">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                <line x1="12" y1="13" x2="12" y2="19"></line>
+                                <line x1="9" y1="16" x2="15" y2="16"></line>
                             </svg>
                         </button>
                     </div>
 
-                    <!-- Building & Room -->
-                    <div class="flex items-center gap-3.5 py-3">
-                        <span class="h-[26px] w-[26px] flex-none text-[#7A1E2B]">
-                            <svg class="h-full w-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                                <path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z" />
-                                <circle cx="12" cy="9.5" r="2.3" />
-                            </svg>
-                        </span>
-                        <div class="min-w-0 flex-1">
-                            <p class="m-0 truncate text-base font-bold">@Event.Building</p>
-                            <p class="m-0 mt-0.5 truncate text-sm text-[#4A4A4A]">@Event.Room</p>
+                    <!-- Location Row -->
+                    <div class="flex items-center justify-between py-3">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center text-[#8B1E22]">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">@Event.Building</p>
+                                <p class="text-xs text-gray-500">@Event.Room</p>
+                            </div>
                         </div>
-                        <button class="h-6 w-6 flex-none cursor-pointer border-none bg-transparent p-0 text-[#1F1F1F] transition-transform hover:scale-110 active:scale-90"
-                                type="button" @onclick="OnGetDirections" aria-label="Get directions" title="Get Directions">
-                            <svg class="h-full w-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                                <path d="M3 11l17-8-8 17-2.5-6.5L3 11Z" stroke-linejoin="round" />
+                        <button class="rounded-lg p-2 text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none"
+                                type="button"
+                                @onclick="OnGetDirections"
+                                aria-label="Get directions">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                                <path d="M12 22l8-5"></path>
                             </svg>
                         </button>
                     </div>
 
-                    <!-- Attendees -->
-                    <div class="flex items-center gap-3.5 py-3">
-                        <span class="h-[26px] w-[26px] flex-none text-[#7A1E2B]">
-                            <svg class="h-full w-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                                <circle cx="9" cy="9" r="3" />
-                                <path d="M4 19c0-3 2.2-5 5-5s5 2 5 5" />
-                                <circle cx="17" cy="10" r="2.4" />
-                                <path d="M15.5 14.2c2.1.4 3.5 2 3.5 4.8" />
-                            </svg>
-                        </span>
-                        <div class="min-w-0 flex-1">
-                            <p class="m-0 text-base font-bold">Attendees</p>
-                            <p class="m-0 mt-0.5 text-sm text-[#4A4A4A]">@Event.Attendees/@Event.Capacity</p>
+                    <!-- Attendees Row -->
+                    <div class="flex items-center justify-between py-3">
+                        <div class="flex items-center gap-3">
+                            <span class="flex items-center justify-center text-[#8B1E22]">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">Attendees</p>
+                                <p class="text-xs text-gray-500">@Event.Attendees/@Event.Capacity</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Toast Feedback Notification -->
-                @if (!string.IsNullOrEmpty(toastMessage))
-                {
-                    <div class="animate-fade-in mt-4 rounded-lg bg-gray-900 p-3 text-xs font-semibold text-white shadow-lg">
-                        @toastMessage
-                    </div>
-                }
+                </div>
             </div>
 
-            <!-- ---------- Right Column (Details & Description) ---------- -->
-            <div class="min-w-0 md:col-span-7 lg:col-span-8">
-                <h1 class="m-0 mb-2 text-3xl leading-tight font-extrabold sm:text-4xl">@Event.Title</h1>
-                <p class="m-0 mb-6 flex items-center gap-2 text-base font-semibold text-[#7A1E2B] sm:text-lg">
-                    @Event.OrganizationName
-                    <span class="inline-flex h-[18px] w-[18px] text-[#F4C10F]" title="Verified organizer">
-                        <svg class="h-full w-full" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2l2.2 2.1 3-.6.6 3 2.1 2.2-1.4 2.8 1.4 2.8-2.1 2.2-.6 3-3-.6L12 22l-2.2-2.1-3 .6-.6-3-2.1-2.2 1.4-2.8L4.1 9.7l2.1-2.2.6-3 3 .6L12 2Z" />
+            <!-- ---------- Right Column ---------- -->
+            <div class="flex flex-col lg:col-span-7">
+                <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">@Event.Title</h1>
+
+                <div class="mt-2 flex items-center gap-2">
+                    <span class="text-base font-semibold text-[#8B1E22]">@Event.OrganizationName</span>
+                    <span title="Verified organizer" class="inline-flex items-center">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#8B1E22">
+                            <path d="M12 2l2.4 2.1 3.2-.5.5 3.2 2.7 1.8-1.3 3 1.3 3-2.7 1.8-.5 3.2-3.2-.5L12 22l-2.4-2.1-3.2.5-.5-3.2-2.7-1.8 1.3-3-1.3-3 2.7-1.8.5-3.2 3.2.5L12 2z" />
+                            <path d="M9.5 12l2 2 4.5-4.5" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
                         </svg>
                     </span>
-                </p>
+                </div>
 
-                <div class="space-y-4">
+                <div class="mt-6 space-y-4">
                     @foreach (var paragraph in Event.DescriptionParagraphs)
                     {
-                        <p class="m-0 text-sm leading-relaxed text-gray-700 sm:text-base">@paragraph</p>
+                        <p class="text-base leading-relaxed text-gray-600">@paragraph</p>
                     }
                 </div>
             </div>
@@ -137,66 +154,22 @@
     </main>
 
     <!-- ===================== FIXED FOOTER / RSVP BAR ===================== -->
-    <footer class="fixed right-0 bottom-0 left-0 z-30 flex items-center justify-between px-6 py-4 shadow-lg transition-colors sm:px-10 @(Event.IsRsvped ? "bg-[#2E9E4C]" : "bg-[#F4C10F]")">
-        <span class="text-lg font-extrabold sm:text-[22px] @(Event.IsRsvped ? "text-white" : "text-[#7A1E2B]")">
-            @(Event.IsRsvped ? "You're registered!" : "Tara, Teknoy!")
-        </span>
-        <button class="cursor-pointer rounded-lg border-none px-8 py-2.5 text-base font-bold text-white transition-all active:scale-95 sm:px-10 sm:py-3 sm:text-[17px] @(Event.IsRsvped ? "bg-white text-[#2E9E4C] hover:bg-gray-100" : "bg-[#7A1E2B] hover:bg-[#5C1620]")"
-                type="button" @onclick="OnRsvpClicked">
-            @(Event.IsRsvped ? "Cancel RSVP" : "RSVP")
-        </button>
+    <footer class="fixed right-0 bottom-0 left-0 z-40 bg-[#8B1E22] px-6 py-4 shadow-lg">
+        <div class="mx-auto flex max-w-7xl items-center justify-between">
+            <span class="text-lg font-bold text-white sm:text-xl">Tara, Teknoy!</span>
+            <button class="rounded-xl bg-[#E2AC22] px-6 py-2.5 text-base font-bold text-[#8B1E22] shadow transition-all hover:bg-[#d49f1b] active:scale-95"
+                    type="button"
+                    @onclick="OnRsvpClicked">
+                RSVP
+            </button>
+        </div>
     </footer>
-
-    <!-- ===================== SEARCH MODAL OVERLAY ===================== -->
-    @if (isSearchOpen)
-    {
-        <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-20 backdrop-blur-sm" @onclick="ToggleSearchModal">
-            <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl transition-all" @onclick:stopPropagation>
-                <div class="flex items-center justify-between border-b pb-3">
-                    <h3 class="text-lg font-bold text-[#7A1E2B]">Search Events</h3>
-                    <button class="text-gray-400 hover:text-gray-700" @onclick="ToggleSearchModal">✕</button>
-                </div>
-                <div class="mt-4">
-                    <input type="text" placeholder="Search by title, category, or location..."
-                           class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-[#7A1E2B] focus:ring-1 focus:ring-[#7A1E2B] focus:outline-none" />
-                </div>
-            </div>
-        </div>
-    }
-
-    <!-- ===================== PROFILE DRAWER OVERLAY ===================== -->
-    @if (isProfileOpen)
-    {
-        <div class="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm" @onclick="ToggleProfileDrawer">
-            <div class="h-full w-80 bg-white p-6 shadow-2xl transition-all" @onclick:stopPropagation>
-                <div class="flex items-center justify-between border-b pb-4">
-                    <h3 class="text-lg font-bold text-[#7A1E2B]">Student Profile</h3>
-                    <button class="text-gray-400 hover:text-gray-700" @onclick="ToggleProfileDrawer">✕</button>
-                </div>
-                <div class="mt-6 flex flex-col items-center text-center">
-                    <div class="flex h-20 w-20 items-center justify-center rounded-full bg-[#7A1E2B] text-2xl font-bold text-[#F4C10F]">
-                        ST
-                    </div>
-                    <h4 class="mt-3 font-bold text-gray-900">Teknoy Student</h4>
-                    <p class="text-xs text-gray-500">student@cit.edu</p>
-                </div>
-                <div class="mt-8 space-y-3">
-                    <button class="w-full rounded-lg bg-gray-100 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200" @onclick='() => Nav.NavigateTo("/events")'>Back to Feed</button>
-                    <button class="w-full rounded-lg bg-red-50 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-100" @onclick='() => Nav.NavigateTo("/")'>Log Out</button>
-                </div>
-            </div>
-        </div>
-    }
 
 </div>
 
 @code {
     [Parameter]
     public int EventId { get; set; }
-
-    private bool isSearchOpen = false;
-    private bool isProfileOpen = false;
-    private string toastMessage = "";
 
     private EventDetailsModel Event { get; set; } = EventDetailsModel.Placeholder;
 
@@ -205,33 +178,11 @@
         Event = EventDetailsModel.Placeholder;
     }
 
-    private void ToggleSearchModal() => isSearchOpen = !isSearchOpen;
-    private void ToggleProfileDrawer() => isProfileOpen = !isProfileOpen;
-
-    private void OnRsvpClicked()
-    {
-        Event.IsRsvped = !Event.IsRsvped;
-        if (Event.IsRsvped)
-        {
-            Event.Attendees++;
-            toastMessage = "Successfully registered for this event!";
-        }
-        else
-        {
-            Event.Attendees--;
-            toastMessage = "RSVP cancelled.";
-        }
-    }
-
-    private void OnAddToCalendar()
-    {
-        toastMessage = "Added to your calendar schedule!";
-    }
-
-    private void OnGetDirections()
-    {
-        toastMessage = $"Directions to {Event.Building} ({Event.Room}) copied to clipboard!";
-    }
+    private void OnSearchClicked() { /* TODO: open search */ }
+    private void OnProfileClicked() { /* TODO: navigate to profile */ }
+    private void OnAddToCalendar() { /* TODO: add event to calendar */ }
+    private void OnGetDirections() { /* TODO: open directions */ }
+    private void OnRsvpClicked() { /* TODO: handle RSVP */ }
 
     public class EventDetailsModel
     {
@@ -243,22 +194,18 @@
         public string Room { get; set; } = "";
         public int Attendees { get; set; }
         public int Capacity { get; set; }
-        public bool IsRsvped { get; set; }
-        public string ImageUrl { get; set; } = "";
         public List<string> DescriptionParagraphs { get; set; } = new();
 
         public static EventDetailsModel Placeholder => new()
         {
-            Title = "Teknoy Tech Summit 2026",
-            OrganizationName = "Computer Students' Society",
+            Title = "Event Title",
+            OrganizationName = "Organization Name",
             DateLabel = "Saturday, Day Month Year",
-            TimeRange = "10:00 A.M. - 02:00 P.M.",
+            TimeRange = "00:00 A.M. - 00:00 P.M.",
             Building = "GLE BLDG",
             Room = "Room 201",
             Attendees = 45,
             Capacity = 60,
-            IsRsvped = false,
-            ImageUrl = "/images/event1.png",
             DescriptionParagraphs = new List<string>
             {
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",

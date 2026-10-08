@@ -1,0 +1,13 @@
+﻿# Tailwind Standalone Executable
+*.exe
+**/tailwindcss.exe
+
+# .NET Build & Temporary Files
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+
+# Node Modules (if using npm)
+node_modules/
